@@ -1,0 +1,28 @@
+{
+    "name": "planningpoker4azuredevops",
+    "version": "0.2.0",
+    "description": "Azure DevOps extension to integrate with Planning Poker application",
+    "scripts": {
+        "clean": "rimraf ./output && rimraf ./dist",
+        "build": "webpack --mode production",
+        "package": "tfx extension create --manifest-globs azure-devops-extension.json --output-path ./output",
+        "publish": "tfx extension publish --manifest-globs azure-devops-extension.json --output-path ./output"
+    },
+    "keywords": [
+        "Planning Poker",
+        "Azure DevOps"
+    ],
+    "author": "Rastislav Novotný",
+    "license": "MIT",
+    "dependencies": {
+        "azure-devops-extension-sdk": "^3.1.2"
+    },
+    "devDependencies": {
+        "rimraf": "^5.0.1",
+        "tfx-cli": "^0.16.0",
+        "ts-loader": "^9.4.4",
+        "typescript": "^5.1.6",
+        "webpack": "^5.88.2",
+        "webpack-cli": "^5.1.4"
+    }
+}

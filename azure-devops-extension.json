@@ -1,0 +1,82 @@
+{
+    "manifestVersion": 1,
+    "id": "planningpoker4azuredevops",
+    "publisher": "Duracellko-NET",
+    "name": "Planning Poker 4 Azure DevOps",
+    "version": "0.2.5",
+    "description": "Azure DevOps extension to integrate with Planning Poker application",
+    "public": false,
+    "categories": [
+        "Azure Boards"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "logo.png"
+    },
+    "content": {
+        "details": {
+            "path": "overview.md"
+        },
+        "license": {
+            "path": "license.md"
+        }
+    },
+    "tags": [
+        "planning poker",
+        "estimation",
+        "effort",
+        "points"
+    ],
+    "links": {
+        "support": {
+            "uri": "https://github.com/duracellko/planningpoker4azuredevops/issues"
+        },
+        "privacypolicy": {
+            "uri": "https://www.duracellko.net/privacy-policy"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/duracellko/planningpoker4azuredevops.git"
+    },
+    "contributions": [
+        {
+            "id": "PlanningPokerAction",
+            "type": "ms.vss-web.action",
+            "description": "Run Planning Poker",
+            "targets": [
+                "ms.vss-work-web.work-item-context-menu"
+            ],
+            "properties": {
+                "text": "Run Planning Poker",
+                "title": "Run Planning Poker",
+                "uri": "PlanningPoker.html",
+                "icon": {
+                    "light": "icon.png",
+                    "dark": "icon.png"
+                }
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "src/PlanningPoker.html",
+            "packagePath": "PlanningPoker.html",
+            "addressable": true
+        },
+        {
+            "path": "dist/PlanningPoker.js",
+            "packagePath": "PlanningPoker.js",
+            "addressable": true
+        },
+        {
+            "path": "assets/icon.png",
+            "packagePath": "icon.png",
+            "addressable": true
+        }
+    ]
+}
