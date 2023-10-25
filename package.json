@@ -15,6 +15,7 @@
     "author": "Rastislav Novotný",
     "license": "MIT",
     "dependencies": {
+        "azure-devops-extension-api": "^2.225.0",
         "azure-devops-extension-sdk": "^3.1.2"
     },
     "devDependencies": {
