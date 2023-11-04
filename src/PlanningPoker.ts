@@ -1,9 +1,18 @@
 import "es6-promise/auto";
-import * as SDK from "azure-devops-extension-sdk";
 import {
+    CommonServiceIds,
+    getClient,
+    ILocationService,
+    IVssRestClientOptions
+} from "azure-devops-extension-api/Common";
+import * as TfsCore from "azure-devops-extension-api/Core";
+import { WorkRestClient } from "azure-devops-extension-api/Work"; 
+import {
+    FieldType,
     IWorkItemFormService,
     WorkItemTrackingServiceIds
 } from "azure-devops-extension-api/WorkItemTracking";
+import * as SDK from "azure-devops-extension-sdk";
 
 const baseUrl = "https://planningpoker.duracellko.net";
 const windowName = "Duracellko.PlanningPoker";
@@ -57,9 +66,10 @@ async function onMessageReceived(event: MessageEvent<EstimationResultMessage>) {
     if (event.origin === baseUrl) {
         if (await checkCallbackReference(event.data.reference)) {
             const workItemFormService = await SDK.getService<IWorkItemFormService>(WorkItemTrackingServiceIds.WorkItemFormService);
-            const estimation = event.data.estimation;
-            
-            await workItemFormService.setFieldValue("Microsoft.VSTS.Scheduling.StoryPoints", estimation);
+            const estimationField = await getEstimationField(workItemFormService);
+            if (estimationField) {
+                await workItemFormService.setFieldValue(estimationField, event.data.estimation);
+            }
 
             window.focus();
         }
@@ -76,7 +86,9 @@ async function checkCallbackReference(reference: string) {
 
             const pageContext = SDK.getPageContext();
             const webContext = pageContext.webContext;
-            if (referenceProject === webContext.project.name) {
+            const tfsContext = webContext as unknown as ITfsContextData;
+            if (referenceProject === webContext.project.name &&
+                referenceCollection === tfsContext.collection.name) {
                 const workItemFormService = await SDK.getService<IWorkItemFormService>(WorkItemTrackingServiceIds.WorkItemFormService);
                 const workItemId = await workItemFormService.getId();
                 return referenceWorkItemId === workItemId;
@@ -85,6 +97,50 @@ async function checkCallbackReference(reference: string) {
     }
 
     return false;
+}
+
+async function getEstimationField(workItemFormService: IWorkItemFormService) {
+    const backlogEstimationField = await getBacklogEstimationField(workItemFormService);
+    if (backlogEstimationField) {
+        return backlogEstimationField;
+    }
+
+    return await getNumberEstimationField(workItemFormService);
+}
+
+async function getBacklogEstimationField(workItemFormService: IWorkItemFormService) {
+    // Automatic resolving of root path does not work, so root path is resolved explicitly.
+    const locationService = await SDK.getService<ILocationService>(CommonServiceIds.LocationService);
+    const rootPath = await locationService.getResourceAreaLocation(WorkRestClient.RESOURCE_AREA_ID);
+    const clientOptions: IVssRestClientOptions = {
+        rootPath: rootPath
+    };
+    const workRestClient = getClient(WorkRestClient, clientOptions);
+    
+    const webContext = SDK.getWebContext();
+    const teamContext: TfsCore.TeamContext = {
+        projectId: webContext.project.id,
+        project: webContext.project.name,
+        teamId: webContext.team.id,
+        team: webContext.team.name
+    };
+    const backlogConfiguration = await workRestClient.getBacklogConfigurations(teamContext);
+
+    const effortField = backlogConfiguration.backlogFields.typeFields["Effort"];
+    if (effortField) {
+        const fields = await workItemFormService.getFields();
+        if (fields.some(f => f.referenceName === effortField)) {
+            return effortField;
+        }
+    }
+
+    return undefined;
+}
+
+async function getNumberEstimationField(workItemFormService: IWorkItemFormService) {
+    const fields = await workItemFormService.getFields();
+    const field = fields.find(f => f.type === FieldType.Double && !f.readOnly);
+    return field?.referenceName;
 }
 
 async function initialize() {

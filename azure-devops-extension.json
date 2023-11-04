@@ -3,7 +3,7 @@
     "id": "planningpoker4azuredevops",
     "publisher": "Duracellko-NET",
     "name": "Planning Poker 4 Azure DevOps",
-    "version": "0.2.7",
+    "version": "0.2.15",
     "description": "Azure DevOps extension to integrate with Planning Poker application",
     "public": false,
     "categories": [
@@ -13,6 +13,9 @@
         {
             "id": "Microsoft.VisualStudio.Services"
         }
+    ],
+    "scopes": [
+        "vso.work"
     ],
     "icons": {
         "default": "logo.png"
